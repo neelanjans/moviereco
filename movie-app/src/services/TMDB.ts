@@ -15,6 +15,7 @@ export const tmdbApi = createApi({
         page,
         showSimilarShows,
         id,
+        genreId,
       }: {
         category: string | undefined;
         type?: string;
@@ -22,6 +23,7 @@ export const tmdbApi = createApi({
         searchQuery?: string;
         showSimilarShows?: boolean;
         id?: number;
+        genreId?: string;
       }) => {
         if (searchQuery) {
           return `search/${category}?api_key=${API_KEY}&query=${searchQuery}&page=${page}`;
@@ -29,6 +31,10 @@ export const tmdbApi = createApi({
 
         if (showSimilarShows) {
           return `${category}/${id}/similar?api_key=${API_KEY}`;
+        }
+
+        if (genreId) {
+          return `discover/${category}?api_key=${API_KEY}&with_genres=${genreId}&page=${page}`;
         }
 
         return `${category}/${type}?api_key=${API_KEY}&page=${page}`;
@@ -39,7 +45,12 @@ export const tmdbApi = createApi({
       query: ({ category, id }: { category: string; id: number }) =>
         `${category}/${id}?append_to_response=videos,credits&api_key=${API_KEY}`,
     }),
+
+    getGenres: builder.query({
+      query: ({ category }: { category: string }) =>
+        `genre/${category}/list?api_key=${API_KEY}`,
+    }),
   }),
 });
 
-export const { useGetShowsQuery, useGetShowQuery } = tmdbApi;
+export const { useGetShowsQuery, useGetShowQuery, useGetGenresQuery } = tmdbApi;

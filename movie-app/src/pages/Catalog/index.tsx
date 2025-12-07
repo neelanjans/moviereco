@@ -4,7 +4,7 @@ import { FiLoader } from "react-icons/fi";
 
 
 import { MovieCard, SkelatonLoader } from "@/common";
-import { CatalogHeader, Search } from "./components";
+import { CatalogHeader, Search, GenreFilter } from "./components";
 import { useGetShowsQuery } from "@/services/TMDB";
 import { smallMaxWidth } from "@/styles";
 import { IMovie } from "@/types";
@@ -13,6 +13,7 @@ const Catalog = () => {
   const [page, setPage] = useState(1);
   const [shows, setShows] = useState<IMovie[]>([]);
   const [isCategoryChanged, setIsCategoryChanged] = useState<boolean>(false);
+  const [selectedGenre, setSelectedGenre] = useState<string>("");
   const [query, setQuery] = useSearchParams();
   const { category } = useParams();
 
@@ -24,12 +25,24 @@ const Catalog = () => {
     page,
     searchQuery,
     type,
+    genreId: selectedGenre,
   });
 
   useEffect(() => {
     setPage(1);
     setIsCategoryChanged(true);
+    setSelectedGenre("");
   }, [category, searchQuery]);
+
+  useEffect(() => {
+    setPage(1);
+    setIsCategoryChanged(true);
+  }, [selectedGenre]);
+
+  const handleGenreChange = (genreId: string) => {
+    setSelectedGenre(genreId);
+    setQuery({});
+  };
 
   useEffect(() => {
     if (isLoading || isFetching) return;
@@ -48,6 +61,11 @@ const Catalog = () => {
     <>
       <CatalogHeader category={String(category)} />
       <section className={`${smallMaxWidth} `}>
+        <GenreFilter
+          category={String(category)}
+          selectedGenre={selectedGenre}
+          onGenreChange={handleGenreChange}
+        />
         <Search setQuery={setQuery}/>
 
         {isLoading || isCategoryChanged ? (
